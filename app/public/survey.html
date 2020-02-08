@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Friends Finder</title>
+
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+  </head>
+
+  <body class="bg-light">
+    <div class="container bg-secondary  mt-3 py-3">
+      <div class="jumbotron">
+        <h1 class="display-3 text-center">Survey Questions</h1>
+        <p class="lead text-center">
+          Please answer the questions to help us find you a friend!
+        </p>
+        <hr class="my-2" />
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">About You</h2>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label for="name"
+              ><i class="material-icons mr-2">perm_identity</i> Name</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="name"
+              aria-describedby="helpId"
+            />
+
+            <label for="image"
+              ><i class="material-icons mt-2 mr-2">add_a_photo</i> Link to Photo
+              Image (Required)</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              name="picture"
+              id="picture"
+              aria-describedby="helpId"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h2 class="card-title">Questions</h2>
+        </div>
+        <div id="survQuestions" class="card-body">
+          <div class="form-group"></div>
+        </div>
+      </div>
+
+      <div class="text-center my-5">
+        <button id="submitButton" class="mdc-button mdc-button--raised w-75">
+          <h3>
+            <i class="material-icons text-success">done</i>
+            Submit
+          </h3>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalShowMatched"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="modelTitleId"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Your new Friend!</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="container text-center" id="setUserInfo"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="dieModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class=" mr-2 text-dark">Please fill out all fields! </i>
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="dieModalBody" class="modal-body ">
+            <p>Did you select all of them?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-info" data-dismiss="modal">
+              Exit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <footer class="footer my-2 mx-0">
+    <div class="container">
+      <a href="/api/friends">API Friends List</a>
+    </div>
+  </footer>
+</html>
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+  crossorigin="anonymous"
+></script>
+
+<script type="text/javascript">
+  let questions = [
+    "Is your pet's mood Elusive?",
+    "Is your pet's mood Warm?",
+    "Is your pet's aura blue?",
+    "If your pet has a sandwich named after them, would it be a Falafel Wrap?",
+    "Do you cuddle with your pet at night?",
+    "Do your pet like the outdoors?",
+    "Is your pet similar to a chameleon?",
+    "Is your pets favorite food tuna?",
+    "Is your pet's favorite game sleep?",
+    "Is walking outside your favorite thing to do together??"
+  ];
+
+  function createQuestions() {
+    let body = document.querySelector("#survQuestions");
+    for (let i = 0; i < questions.length; i++) {
+      let newQuestion = `<div class="my-4">
+        <h4>Question ${i + 1}</h4>
+        <label for="question${i + 1}">${questions[i]}</label>
+        <select
+        class="form-control"
+        name="question${i + 1}"
+        id="question${i + 1}">
+        <option value="" selected="selected" hidden="hidden">Select an Option</option>
+        <option value="1">1 (Strongly Disagree)</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5 (Strongly Agree)</option>
+        </select>
+    </div>`;
+
+      body.insertAdjacentHTML("beforeend", newQuestion);
+    }
+  }
+
+  createQuestions();
+
+  function clearData() {
+    document.querySelector("#survQuestions").innerHTML = "";
+    let txtBoxes = document.querySelectorAll("input");
+    for (let element of txtBoxes) {
+      element.value = "";
+    }
+    createQuestions();
+  }
+
+  function onClick(event) {
+    if (
+      !document.querySelector("#name").value ||
+      !document.querySelector("#picture").value
+    ) {
+      $("#dieModal").modal("show");
+      return;
+    }
+    let scoreSum = [];
+    let arrayWithScores = document.querySelectorAll("select");
+
+    for (let answer of arrayWithScores) {
+      let answerValue = answer.value;
+  
+      if (answerValue) {
+    
+        scoreSum.push(parseInt(answerValue));
+      }
+  
+      else {
+        $("#dieModal").modal("show");
+        return;
+      }
+    }
+    
+    let userInput = {
+      name: document.querySelector("#name").value.trim(),
+      picture: document.querySelector("#picture").value.trim(),
+      score: scoreSum
+    };
+    
+    fetch("/api/friends", {
+      method: "POST",
+      body: JSON.stringify(userInput),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        clearData();
+        
+        let perfectMatchName = `<h2>${data.name}</h2>
+        <img src="${data.picture}" alt="" height="320" width="320"/>`;
+       
+        let _parent = document.querySelector("#setUserInfo");
+      
+        _parent.insertAdjacentHTML("beforeend", perfectMatchName);
+ 
+        $("#modalShowMatched").modal("show");
+      });
+  }
+
+  document
+    .querySelector("#submitButton")
+    .addEventListener("click", onClick);
+
+
+  $("#modalShowMatched").on("hidden.bs.modal", function(event) {
+
+    let _parent = document.querySelector("#setUserInfo");
+ 
+    _parent.innerHTML = "";
+  });
+</script>
